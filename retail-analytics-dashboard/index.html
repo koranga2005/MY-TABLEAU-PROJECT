@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retail Sales & Customer Analytics Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="assets/dashboard.css" />
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR NAV
+     ============================================================ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <i class="ti ti-chart-dots-3"></i>
+    <span class="brand-text">RetailIQ</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Analytics</div>
+    <a href="#" class="nav-item active" data-section="overview">
+      <i class="ti ti-layout-dashboard"></i><span>Overview</span>
+    </a>
+    <a href="#" class="nav-item" data-section="sales">
+      <i class="ti ti-chart-bar"></i><span>Sales Trends</span>
+    </a>
+    <a href="#" class="nav-item" data-section="customers">
+      <i class="ti ti-users"></i><span>Customers</span>
+    </a>
+    <a href="#" class="nav-item" data-section="products">
+      <i class="ti ti-package"></i><span>Products</span>
+    </a>
+
+    <div class="nav-group-label" style="margin-top:1.5rem">Reports</div>
+    <a href="#" class="nav-item" data-section="regional">
+      <i class="ti ti-map-pin"></i><span>Regional</span>
+    </a>
+    <a href="#" class="nav-item" data-section="cohorts">
+      <i class="ti ti-timeline"></i><span>Cohort Analysis</span>
+    </a>
+
+    <div class="nav-group-label" style="margin-top:1.5rem">Data</div>
+    <a href="data/retail_sales_data.csv" class="nav-item" download>
+      <i class="ti ti-file-download"></i><span>Export CSV</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">A</div>
+      <div class="user-info">
+        <div class="user-name">Analyst</div>
+        <div class="user-role">Dashboard v2.0</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main-content">
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('collapsed')" aria-label="Toggle sidebar">
+      <i class="ti ti-menu-2"></i>
+    </button>
+    <div class="topbar-title" id="section-title">Overview</div>
+
+    <div class="topbar-controls">
+      <div class="filter-group">
+        <label class="filter-label"><i class="ti ti-calendar"></i></label>
+        <select id="yearFilter" onchange="updateDashboard()">
+          <option value="2024">FY 2024</option>
+          <option value="2023">FY 2023</option>
+          <option value="2022">FY 2022</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label"><i class="ti ti-map-pin"></i></label>
+        <select id="regionFilter" onchange="updateDashboard()">
+          <option value="all">All Regions</option>
+          <option value="north">North</option>
+          <option value="south">South</option>
+          <option value="east">East</option>
+          <option value="west">West</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label"><i class="ti ti-tag"></i></label>
+        <select id="categoryFilter" onchange="updateDashboard()">
+          <option value="all">All Categories</option>
+          <option value="electronics">Electronics</option>
+          <option value="apparel">Apparel</option>
+          <option value="home">Home & Living</option>
+          <option value="sports">Sports</option>
+        </select>
+      </div>
+      <button class="btn-refresh" onclick="updateDashboard()" title="Refresh data">
+        <i class="ti ti-refresh"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Page Body -->
+  <div class="page-body">
+
+    <!-- ── KPI STRIP ─────────────────────────────── -->
+    <section class="kpi-strip" aria-label="Key performance indicators">
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#EAF3DE;color:#3B6D11;"><i class="ti ti-currency-dollar"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Revenue</div>
+          <div class="kpi-value" id="kpiRev">$4.82M</div>
+          <div class="kpi-delta positive" id="kpiRevDelta">▲ 12.4% vs prior year</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#E6F1FB;color:#185FA5;"><i class="ti ti-shopping-cart"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Orders</div>
+          <div class="kpi-value" id="kpiOrders">38,214</div>
+          <div class="kpi-delta positive" id="kpiOrdersDelta">▲ 8.7% vs prior year</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#FAEEDA;color:#854F0B;"><i class="ti ti-receipt"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Avg Order Value</div>
+          <div class="kpi-value" id="kpiAOV">$126.10</div>
+          <div class="kpi-delta positive" id="kpiAOVDelta">▲ 3.4% vs prior year</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#EEEDFE;color:#534AB7;"><i class="ti ti-users"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Active Customers</div>
+          <div class="kpi-value" id="kpiCust">12,847</div>
+          <div class="kpi-delta positive" id="kpiCustDelta">▲ 15.2% vs prior year</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#E1F5EE;color:#0F6E56;"><i class="ti ti-trending-up"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Gross Margin</div>
+          <div class="kpi-value" id="kpiMargin">38.6%</div>
+          <div class="kpi-delta negative" id="kpiMarginDelta">▼ 1.1pp vs prior year</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#FAECE7;color:#993C1D;"><i class="ti ti-arrow-back-up"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Return Rate</div>
+          <div class="kpi-value" id="kpiReturn">6.2%</div>
+          <div class="kpi-delta positive" id="kpiReturnDelta">▼ 0.8pp vs prior year</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ROW 1 ───────────────────────────────────── -->
+    <div class="chart-row two-thirds">
+      <div class="chart-card span-2">
+        <div class="chart-header">
+          <div class="chart-title"><i class="ti ti-chart-bar"></i> Monthly Revenue &amp; Orders</div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#185FA5"></span>Revenue ($K)</span>
+            <span class="legend-item"><span class="legend-dot round" style="background:#1D9E75"></span>Orders</span>
+          </div>
+        </div>
+        <div class="canvas-wrap" style="height:240px;">
+          <canvas id="revOrderChart" aria-label="Monthly revenue and orders for the selected fiscal year"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card span-1">
+        <div class="chart-header">
+          <div class="chart-title"><i class="ti ti-chart-donut"></i> Category Split</div>
+        </div>
+        <div class="canvas-wrap" style="height:215px;">
+          <canvas id="categoryChart" aria-label="Revenue share by product category donut chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ROW 2 ───────────────────────────────────── -->
+    <div class="chart-row equal">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title"><i class="ti ti-map"></i> Regional Revenue</div>
+        </div>
+        <div class="canvas-wrap" style="height:200px;">
+          <canvas id="regionalChart" aria-label="Revenue breakdown by region horizontal bar chart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title"><i class="ti ti-user-plus"></i> Acquisition vs Churn</div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>Acquired</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#E24B4A"></span>Churned</span>
+          </div>
+        </div>
+        <div class="canvas-wrap" style="height:200px;">
+          <canvas id="cohortChart" aria-label="Monthly customer acquisition versus churn bar chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ROW 3 ───────────────────────────────────── -->
+    <div class="chart-row two-thirds">
+      <div class="chart-card span-2">
+        <div class="chart-header">
+          <div class="chart-title"><i class="ti ti-trophy"></i> Top Products by Revenue</div>
+          <div class="badge-count" id="productCount">7 products</div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" aria-label="Top products by revenue">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Revenue</th>
+                <th>Units Sold</th>
+                <th>Avg Price</th>
+                <th>Margin</th>
+                <th>YoY Trend</th>
+              </tr>
+            </thead>
+            <tbody id="productTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="chart-card span-1">
+        <div class="chart-header">
+          <div class="chart-title"><i class="ti ti-users-group"></i> Customer Segments</div>
+        </div>
+        <div class="seg-list" id="segmentList"></div>
+
+        <div style="margin-top:1.5rem">
+          <div class="chart-title" style="margin-bottom:0.75rem;"><i class="ti ti-repeat"></i> Repeat Purchase Rate</div>
+          <div class="canvas-wrap" style="height:120px;">
+            <canvas id="rprChart" aria-label="Repeat purchase rate trend line chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FOOTER ─────────────────────────────────── -->
+    <footer class="dash-footer">
+      <span>Retail Sales &amp; Customer Analytics Dashboard</span>
+      <span>Data: Synthetic — generated for portfolio demonstration</span>
+      <span id="lastUpdated">Last updated: —</span>
+    </footer>
+
+  </div><!-- /page-body -->
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/dashboard.js"></script>
+</body>
+</html>
